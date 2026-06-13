@@ -1,0 +1,11 @@
+<h1>Your Projects</h1>
+
+<a href="/dashboard">Back</a>
+
+<ul>
+<% projects.forEach(p=>{ %>
+    <li>
+        <a href="/project/<%=p._id%>"><%=p.title%></a>
+    </li>
+<% }) %>
+</ul>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<button onclick="toggleTheme()" id="themeBtn"
+style="position:fixed;top:12px;right:12px;width:42px;height:42px;border:none;border-radius:50%;cursor:pointer;background:white;display:flex;align-items:center;justify-content:center;">
+</button>
+<div class="container">
+
+    <div class="card">
+        <h2>Register</h2>
+
+        <form method="POST" action="/register">
+            <input class="input" name="username" placeholder="Username" required>
+            <input class="input" name="email" placeholder="Email" required>
+            <input class="input" name="password" type="password" placeholder="Password" required>
+
+            <button class="btn btn-green" type="submit">Register</button>
+        </form>
+
+        <p>Already have an account? <a href="/login">Login</a></p>
+    </div>
+
+</div>
+<script>
+function setTheme(theme){
+    document.body.className=theme;
+    localStorage.setItem("theme",theme);
+    updateIcon(theme);
+}
+
+function toggleTheme(){
+    if(document.body.classList.contains("dark")){
+        setTheme("light");
+    }else{
+        setTheme("dark");
+    }
+}
+
+function updateIcon(theme){
+    const btn=document.getElementById("themeBtn");
+
+    if(theme==="dark"){
+        // 🌞 SUN (dark mode active)
+        btn.innerHTML=`
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="orange">
+            <circle cx="12" cy="12" r="5"/>
+        </svg>`;
+    }else{
+        // 🌙 DARK MOON (filled dark style)
+        btn.innerHTML=`
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="black">
+            <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>
+        </svg>`;
+    }
+}
+
+window.onload=function(){
+    let saved=localStorage.getItem("theme")||"light";
+    document.body.className=saved;
+    updateIcon(saved);
+}
+</script></body>
+</html>
