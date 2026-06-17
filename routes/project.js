@@ -1,13 +1,13 @@
 
-const OpenAI=require("openai");
 const express=require("express");
 const router=express.Router();
 const Project=require("../models/Project");
-const axios=require("axios");
 
 
-const openai=new OpenAI({
-    apiKey:process.env.OPENAI_API_KEY
+const {GoogleGenAI}=require("@google/genai");
+
+const ai=new GoogleGenAI({
+    apiKey:process.env.GEMINI_API_KEY
 });
 
 // =====================
@@ -36,30 +36,6 @@ router.get("/list",async(req,res)=>{
     res.render("dashboard",{projects});
 });
 
-// =====================
-// TEST AI ROUTE (must be ABOVE :id)
-// =====================
-router.get("/test-ai",async(req,res)=>{
-    try{
-        const response=await axios.post("https://api.openai.com/v1/chat/completions",{
-            model:"gpt-4o-mini",
-            messages:[
-                {role:"user",content:"Say hello"}
-            ]
-        },{
-            headers:{
-                "Authorization":`Bearer ${process.env.OPENAI_API_KEY}`,
-                "Content-Type":"application/json"
-            }
-        });
-
-        res.send(response.data.choices[0].message.content);
-
-    }catch(err){
-        console.log("TEST AI ERROR:",err.response?.data||err.message);
-        res.send("AI test failed");
-    }
-});
 
 // =====================
 // OPEN PROJECT
@@ -88,52 +64,106 @@ router.post("/save/:id",async(req,res)=>{
 // AI FEATURE (EXPLAIN / FIX)
 // =====================
 router.post("/ai/:id",async(req,res)=>{
-    const Project=require("../models/Project");
 
-    const project=await Project.findById(req.params.id);
+    try{
 
-    let aiResponse="";
+        const project=
+        await Project.findById(req.params.id);
 
-    const code=project.code || "";
+        const code=
+        project.code || "";
 
-    // =====================
-    // EXPLAIN CODE (MOCK AI)
-    // =====================
-    if(req.body.type==="explain"){
+        let prompt="";
 
-        if(code.includes("for")){
-            aiResponse="This code uses a loop (for loop) to repeat a task multiple times.";
-        }
-        else if(code.includes("function")){
-            aiResponse="This code defines a function which can be reused multiple times.";
-        }
-        else if(code.includes("console.log")){
-            aiResponse="This code prints output to the console for debugging or display.";
-        }
-        else{
-            aiResponse="This code performs some operations. It defines logic using JavaScript syntax.";
-        }
+     if(req.body.type==="explain"){
+
+    prompt=`
+You are an AI Code Assistant.
+
+Explain the code briefly.
+
+Format:
+
+Purpose:
+Working:
+Time Complexity:
+Space Complexity:
+
+Keep the answer under 100 words.
+Do not give long tutorials.
+
+Code:
+${code}
+`;
+
+}else{
+
+   prompt=`
+You are an expert debugging assistant.
+
+Find only the most important bug.
+
+Format exactly:
+
+Bug:
+Fixed Code:
+
+Keep the answer under 60 words.
+
+Code:
+${code}
+`;
+}
+
+        const response=
+        await ai.models.generateContent({
+            model:"gemini-2.5-flash",
+            contents:prompt
+        });
+
+        const aiResponse=response.text.trim();
+
+        res.render("project",{
+            project,
+            aiResponse
+        });
+
+    }catch(err){
+
+        console.log(err);
+
+        res.send("AI Error: "+err.message);
+
     }
 
-    // =====================
-    // FIX CODE (MOCK AI)
-    // =====================
-    if(req.body.type==="fix"){
+});
 
-        if(code.includes("=") && code.includes("if")){
-            aiResponse="Possible issue: You might be using assignment '=' instead of comparison '==' or '===' inside condition.";
+router.post("/delete/:id",async(req,res)=>{
+
+    try{
+
+        const project=
+        await Project.findById(req.params.id);
+
+        if(!project){
+            return res.send("Project not found");
         }
-        else if(!code.includes(";")){
-            aiResponse="Possible issue: Missing semicolons may cause unexpected behavior.";
+
+        if(project.userId.toString()!==req.session.userId){
+            return res.status(403).send("Forbidden");
         }
-        else if(code.includes("console.log")){
-            aiResponse="Code looks mostly fine. Ensure variables are defined properly.";
-        }
-        else{
-            aiResponse="No major issues found. Code structure looks okay.";
-        }
+
+        await Project.findByIdAndDelete(req.params.id);
+
+        res.redirect("/project/list");
+
+    }catch(err){
+
+        console.log(err);
+
+        res.send("Delete failed");
+
     }
 
-    res.render("project",{project,aiResponse});
 });
 module.exports=router;
