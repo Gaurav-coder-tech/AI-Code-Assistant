@@ -38,7 +38,7 @@ app.use("/",authRoutes);
 app.use("/project",projectRoutes);
 
 app.get("/",(req,res)=>{
-    res.send("AI Code Assistant is running");
+    res.redirect("/login");
 });
 
 const PORT=process.env.PORT||3000;
