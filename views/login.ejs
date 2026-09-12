@@ -1,66 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login</title>
-    <link rel="stylesheet" href="/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - AI Code Assistant</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        *{
+            box-sizing:border-box;
+        }
+
+        body{
+            margin:0;
+            font-family:Arial,sans-serif;
+            min-height:100vh;
+            background:#f3f4f6;
+        }
+
+        .dark-mode{
+            background:#111827;
+            color:white;
+        }
+
+        .login-container{
+            width:100%;
+            max-width:430px;
+            margin:auto;
+            padding:20px;
+        }
+
+        .login-card{
+            background:white;
+            border-radius:16px;
+            padding:28px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .dark-card{
+            background:#1f2937;
+            color:white;
+        }
+
+        input{
+            width:100%;
+            padding:13px 14px;
+            border:1px solid #d1d5db;
+            border-radius:8px;
+            outline:none;
+            font-size:15px;
+        }
+
+        input:focus{
+            border-color:#3b82f6;
+            box-shadow:0 0 0 2px rgba(59,130,246,0.15);
+        }
+
+        button{
+            width:100%;
+            padding:13px;
+            border:none;
+            border-radius:8px;
+            background:#2563eb;
+            color:white;
+            font-size:15px;
+            font-weight:600;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#1d4ed8;
+        }
+
+        @media(max-width:480px){
+            .login-container{
+                padding:16px;
+            }
+
+            .login-card{
+                padding:22px 18px;
+                border-radius:14px;
+            }
+
+            h1{
+                font-size:24px;
+            }
+        }
+    </style>
 </head>
-<body>
-<button onclick="toggleTheme()" id="themeBtn"
-style="position:fixed;top:12px;right:12px;width:42px;height:42px;border:none;border-radius:50%;cursor:pointer;background:white;display:flex;align-items:center;justify-content:center;">
-</button>
-<div class="container">
 
-    <div class="card">
-        <h2>Login</h2>
+<body id="body">
 
-        <form method="POST" action="/login">
-            <input class="input" name="email" placeholder="Email" required>
-            <input class="input" name="password" type="password" placeholder="Password" required>
-
-            <button class="btn btn-blue" type="submit">Login</button>
-        </form>
-
-        <p>Don't have an account? <a href="/register">Register</a></p>
+    <div class="flex justify-end p-4">
+        <button
+            onclick="toggleDarkMode()"
+            style="width:auto;padding:9px 12px;border-radius:50%;background:#111827;"
+            id="themeButton">
+            🌙
+        </button>
     </div>
 
-</div>
-<script>
-function setTheme(theme){
-    document.body.className=theme;
-    localStorage.setItem("theme",theme);
-    updateIcon(theme);
-}
+    <div class="login-container">
 
-function toggleTheme(){
-    if(document.body.classList.contains("dark")){
-        setTheme("light");
-    }else{
-        setTheme("dark");
-    }
-}
+        <div class="login-card" id="card">
 
-function updateIcon(theme){
-    const btn=document.getElementById("themeBtn");
+            <div class="text-center mb-7">
+                <h1 class="text-2xl font-bold mb-2">
+                    AI Code Assistant
+                </h1>
 
-    if(theme==="dark"){
-        // 🌞 SUN (dark mode active)
-        btn.innerHTML=`
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="orange">
-            <circle cx="12" cy="12" r="5"/>
-        </svg>`;
-    }else{
-        // 🌙 DARK MOON (filled dark style)
-        btn.innerHTML=`
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="black">
-            <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>
-        </svg>`;
-    }
-}
+                <p class="text-gray-500 text-sm">
+                    Login to manage your coding projects
+                </p>
+            </div>
 
-window.onload=function(){
-    let saved=localStorage.getItem("theme")||"light";
-    document.body.className=saved;
-    updateIcon(saved);
-}
-</script></body>
+            <h2 class="text-xl font-semibold mb-5">
+                Login
+            </h2>
+
+            <form action="/login" method="POST">
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-sm font-medium mb-2">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required>
+                </div>
+
+                <button type="submit">
+                    Login
+                </button>
+
+            </form>
+
+            <p class="text-center text-sm text-gray-500 mt-6">
+                Don't have an account?
+                <a
+                    href="/register"
+                    class="text-blue-600 font-medium hover:underline">
+                    Register
+                </a>
+            </p>
+
+        </div>
+
+    </div>
+
+    <script>
+        function toggleDarkMode(){
+            const body=document.getElementById("body");
+            const card=document.getElementById("card");
+            const button=document.getElementById("themeButton");
+
+            body.classList.toggle("dark-mode");
+            card.classList.toggle("dark-card");
+
+            if(body.classList.contains("dark-mode")){
+                button.innerHTML="☀️";
+            }else{
+                button.innerHTML="🌙";
+            }
+        }
+    </script>
+
+</body>
 </html>

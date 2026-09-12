@@ -1,67 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
-    <link rel="stylesheet" href="/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register - AI Code Assistant</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        *{
+            box-sizing:border-box;
+        }
+
+        body{
+            margin:0;
+            font-family:Arial,sans-serif;
+            min-height:100vh;
+            background:#f3f4f6;
+        }
+
+        .register-container{
+            width:100%;
+            max-width:430px;
+            margin:auto;
+            padding:20px;
+        }
+
+        .register-card{
+            background:white;
+            border-radius:16px;
+            padding:28px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        input{
+            width:100%;
+            padding:13px 14px;
+            border:1px solid #d1d5db;
+            border-radius:8px;
+            outline:none;
+            font-size:15px;
+        }
+
+        input:focus{
+            border-color:#3b82f6;
+            box-shadow:0 0 0 2px rgba(59,130,246,0.15);
+        }
+
+        button{
+            width:100%;
+            padding:13px;
+            border:none;
+            border-radius:8px;
+            background:#2563eb;
+            color:white;
+            font-size:15px;
+            font-weight:600;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#1d4ed8;
+        }
+
+        @media(max-width:480px){
+            .register-container{
+                padding:16px;
+            }
+
+            .register-card{
+                padding:22px 18px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-<button onclick="toggleTheme()" id="themeBtn"
-style="position:fixed;top:12px;right:12px;width:42px;height:42px;border:none;border-radius:50%;cursor:pointer;background:white;display:flex;align-items:center;justify-content:center;">
-</button>
-<div class="container">
 
-    <div class="card">
-        <h2>Register</h2>
+    <div class="register-container">
 
-        <form method="POST" action="/register">
-            <input class="input" name="username" placeholder="Username" required>
-            <input class="input" name="email" placeholder="Email" required>
-            <input class="input" name="password" type="password" placeholder="Password" required>
+        <div class="register-card">
 
-            <button class="btn btn-green" type="submit">Register</button>
-        </form>
+            <div class="text-center mb-7">
+                <h1 class="text-2xl font-bold mb-2">
+                    AI Code Assistant
+                </h1>
 
-        <p>Already have an account? <a href="/login">Login</a></p>
+                <p class="text-gray-500 text-sm">
+                    Create your account
+                </p>
+            </div>
+
+            <h2 class="text-xl font-semibold mb-5">
+                Register
+            </h2>
+
+            <form action="/register" method="POST">
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Enter username"
+                        required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Enter email"
+                        required>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-sm font-medium mb-2">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Create password"
+                        required>
+                </div>
+
+                <button type="submit">
+                    Create Account
+                </button>
+
+            </form>
+
+            <p class="text-center text-sm text-gray-500 mt-6">
+                Already have an account?
+                <a
+                    href="/login"
+                    class="text-blue-600 font-medium hover:underline">
+                    Login
+                </a>
+            </p>
+
+        </div>
+
     </div>
 
-</div>
-<script>
-function setTheme(theme){
-    document.body.className=theme;
-    localStorage.setItem("theme",theme);
-    updateIcon(theme);
-}
-
-function toggleTheme(){
-    if(document.body.classList.contains("dark")){
-        setTheme("light");
-    }else{
-        setTheme("dark");
-    }
-}
-
-function updateIcon(theme){
-    const btn=document.getElementById("themeBtn");
-
-    if(theme==="dark"){
-        // 🌞 SUN (dark mode active)
-        btn.innerHTML=`
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="orange">
-            <circle cx="12" cy="12" r="5"/>
-        </svg>`;
-    }else{
-        // 🌙 DARK MOON (filled dark style)
-        btn.innerHTML=`
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="black">
-            <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>
-        </svg>`;
-    }
-}
-
-window.onload=function(){
-    let saved=localStorage.getItem("theme")||"light";
-    document.body.className=saved;
-    updateIcon(saved);
-}
-</script></body>
+</body>
 </html>
