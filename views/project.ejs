@@ -1,100 +1,271 @@
 <!DOCTYPE html>
-<html class="h-full">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
-        tailwind.config = {
-            darkMode: 'class'
+        tailwind.config={
+            darkMode:"class"
         }
     </script>
 
-    <title>Project</title>
+    <title><%= project.title %> - AI Code Assistant</title>
 </head>
 
-<body class="h-full bg-gray-100 dark:bg-gray-900 transition-all">
+<body class="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
 
-<!-- Dark Mode Button -->
-<button id="themeBtn"
-    onclick="toggleDark()"
-    class="absolute top-2 right-2 bg-black dark:bg-white text-white dark:text-black px-3 py-1 rounded transition">
-    Dark Mode
-</button>
+    <!-- Top Bar -->
+    <div class="flex justify-between items-center px-6 py-4 bg-white dark:bg-gray-800 shadow">
 
-<div class="min-h-screen flex">
-
-    <!-- Sidebar -->
-    <div class="w-64 bg-white dark:bg-gray-800 shadow-lg p-4">
-    <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-        Projects
-    </h2>
-
-    <a href="/project/list"
-       class="block p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-gray-900 dark:text-white">
-        ← All Projects
-    </a>
-</div>
-    <!-- Main Area -->
-    <div class="flex-1 p-6">
-
-        <h1 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-            <%= project.title %>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-white">
+            AI Code Assistant
         </h1>
 
-        <!-- SAVE FORM -->
-        <form method="POST" action="/project/save/<%=project._id%>">
-            <textarea
-                class="w-full h-96 p-4 bg-gray-900 text-green-400 font-mono rounded-lg"
-                name="code"
-            ><%= project.code %></textarea>
+        <div class="flex items-center gap-3">
 
-            <div class="mt-3">
-                <button class="bg-blue-500 text-white px-4 py-2 rounded">
-                    Save
-                </button>
-            </div>
-        </form>
-
-        <!-- AI BUTTONS -->
-        <form method="POST" action="/project/ai/<%=project._id%>" class="mt-3">
-            <input type="hidden" name="type" value="explain">
-            <button class="bg-green-500 text-white px-4 py-2 rounded">
-                Explain Code
+            <button
+                onclick="toggleDark()"
+                id="themeBtn"
+                class="bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 px-4 py-2 rounded-lg">
+                Dark Mode
             </button>
-        </form>
 
-        <form method="POST" action="/project/ai/<%=project._id%>" class="mt-2">
-            <input type="hidden" name="type" value="fix">
-            <button class="bg-red-500 text-white px-4 py-2 rounded">
-                Fix Code
-            </button>
-        </form>
+            <a
+                href="/logout"
+                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+                Logout
+            </a>
 
-        <!-- AI OUTPUT -->
-        <% if(typeof aiResponse !== 'undefined'){ %><div class="mt-5 p-4 bg-white dark:bg-gray-800 shadow rounded text-gray-900 dark:text-white"><h3 class="font-bold mb-2">🤖 AI Response</h3><pre class="whitespace-pre-wrap"><%= aiResponse %></pre></div><% } %>
+        </div>
 
     </div>
-</div>
 
-<!-- DARK MODE SCRIPT -->
-<script>
-function toggleDark(){
-    const html=document.documentElement;
-    const btn=document.getElementById("themeBtn");
 
-    html.classList.toggle("dark");
+    <!-- Main -->
+    <div class="max-w-7xl mx-auto p-6">
 
-    if(html.classList.contains("dark")){
-        btn.innerText="Light Mode";
-        btn.classList.remove("bg-black");
-        btn.classList.add("bg-white","text-black");
-    }else{
-        btn.innerText="Dark Mode";
-        btn.classList.remove("bg-white","text-black");
-        btn.classList.add("bg-black","text-white");
-    }
-}
-</script>
+        <!-- Back -->
+        <a
+            href="/project/list"
+            class="text-blue-500 hover:underline">
+            ← Back to Projects
+        </a>
+
+
+        <!-- Project Title -->
+        <h2 class="text-3xl font-bold mt-5 mb-5 text-gray-900 dark:text-white">
+            <%= project.title %>
+        </h2>
+
+
+        <!-- Code Editor -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+
+            <div class="flex justify-between items-center mb-3">
+
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    Code Editor
+                </h3>
+
+            </div>
+
+
+            <form
+                method="POST"
+                action="/project/save/<%= project._id %>">
+
+                <textarea
+                    id="code"
+                    name="code"
+                    class="w-full h-96 bg-gray-900 text-green-400 font-mono p-5 rounded-lg outline-none resize-y"
+                    spellcheck="false"><%= project.code %></textarea>
+
+
+                <!-- Save -->
+                <button
+                    type="submit"
+                    class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg">
+
+                    💾 Save Code
+
+                </button>
+
+            </form>
+
+
+            <!-- Run Code -->
+            <form
+                method="POST"
+                action="/project/run/<%= project._id %>"
+                class="mt-4 flex flex-wrap gap-3 items-center">
+
+                <!-- Language -->
+                <select
+                    name="language"
+                    class="px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 dark:text-white">
+
+                    <option value="cpp"
+                        <%= selectedLanguage==="cpp" || !selectedLanguage ? "selected" : "" %>>
+                        C++
+                    </option>
+
+                    <option value="java"
+                        <%= selectedLanguage==="java" ? "selected" : "" %>>
+                        Java
+                    </option>
+
+                </select>
+
+
+                <!-- Input -->
+                <input
+                    type="text"
+                    name="stdin"
+                    placeholder="Input (optional)"
+                    class="px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 dark:text-white">
+
+
+                <!-- Hidden Code -->
+                <input
+                    type="hidden"
+                    name="code"
+                    id="runCode">
+
+
+                <!-- Run Button -->
+                <button
+                    type="submit"
+                    onclick="document.getElementById('runCode').value=document.getElementById('code').value"
+                    class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg">
+
+                    ▶ Run Code
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- Output -->
+        <% if(typeof output!=="undefined"){ %>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5 mt-6">
+
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                💻 Output
+            </h3>
+
+            <pre
+                class="bg-black text-green-400 p-5 rounded-lg overflow-x-auto whitespace-pre-wrap min-h-20"><%= output %></pre>
+
+        </div>
+
+        <% } %>
+
+
+        <!-- AI Features -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5 mt-6">
+
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                🤖 AI Code Assistant
+            </h3>
+
+
+            <div class="flex flex-wrap gap-3">
+
+                <!-- Explain -->
+                <form
+                    method="POST"
+                    action="/project/ai/<%= project._id %>">
+
+                    <input
+                        type="hidden"
+                        name="type"
+                        value="explain">
+
+                    <button
+                        type="submit"
+                        class="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg">
+
+                        💡 Explain Code
+
+                    </button>
+
+                </form>
+
+
+                <!-- Fix -->
+                <form
+                    method="POST"
+                    action="/project/ai/<%= project._id %>">
+
+                    <input
+                        type="hidden"
+                        name="type"
+                        value="fix">
+
+                    <button
+                        type="submit"
+                        class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg">
+
+                        🔧 Fix Code
+
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- AI Response -->
+            <% if(typeof aiResponse!=="undefined"){ %>
+
+            <div class="mt-5">
+
+                <h4 class="font-bold text-gray-900 dark:text-white mb-2">
+                    AI Response
+                </h4>
+
+                <pre
+                    class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200 p-5 rounded-lg whitespace-pre-wrap"><%= aiResponse %></pre>
+
+            </div>
+
+            <% } %>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        function toggleDark(){
+
+            const html=document.documentElement;
+            const btn=document.getElementById("themeBtn");
+
+            html.classList.toggle("dark");
+
+            if(html.classList.contains("dark")){
+
+                btn.innerText="Light Mode";
+
+            }else{
+
+                btn.innerText="Dark Mode";
+
+            }
+
+        }
+
+    </script>
+
 </body>
+
 </html>

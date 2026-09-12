@@ -11,15 +11,15 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.use(session({
-    secret:"secretkey",
+    secret:process.env.SESSION_SECRET,
     resave:false,
-    saveUninitialized:false
+    saveUninitialized:false,
+    cookie:{
+        httpOnly:true,
+        secure:false,
+        maxAge:1000*60*60*24
+    }
 }));
-
-app.use((req,res,next)=>{
-    console.log("SESSION:",req.session.userId);
-    next();
-});
 // DB connect
 mongoose.connect(process.env.MONGO_URI).then(()=>console.log("DB connected"))
 .catch(err=>console.log(err));
