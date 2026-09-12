@@ -1,11 +1,13 @@
 require("dotenv").config();
 
 const express=require("express");
-const app=express();
 const mongoose=require("mongoose");
 const session=require("express-session");
 
+const app=express();
+
 app.set("view engine","ejs");
+
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 app.use(express.static("public"));
@@ -20,22 +22,27 @@ app.use(session({
         maxAge:1000*60*60*24
     }
 }));
-// DB connect
-mongoose.connect(process.env.MONGO_URI).then(()=>console.log("DB connected"))
-.catch(err=>console.log(err));
 
-// routes
+mongoose.connect(process.env.MONGO_URI)
+.then(()=>{
+    console.log("DB connected");
+})
+.catch((err)=>{
+    console.log("MongoDB connection error:",err);
+});
+
 const authRoutes=require("./routes/auth");
 const projectRoutes=require("./routes/project");
 
 app.use("/",authRoutes);
 app.use("/project",projectRoutes);
 
-// test route
 app.get("/",(req,res)=>{
-    res.send("Working");
+    res.send("AI Code Assistant is running");
 });
 
-app.listen(3000,()=>{
-    console.log("Server running on port 3000");
+const PORT=process.env.PORT||3000;
+
+app.listen(PORT,()=>{
+    console.log(`Server running on port ${PORT}`);
 });
